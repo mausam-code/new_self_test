@@ -103,7 +103,7 @@
 
             try{
                 //const response = await fetch('http://localhost:55555/api/resetPassword',
-		const response = await fetch('https://resetpw.season.name.np/api/resetPassword',
+		        const response = await fetch('https://resetpw.season.name.np/api/resetPassword',
                     {
                         method: 'POST',
                         headers :{
@@ -141,6 +141,12 @@
 
                     msg.className = 'msg success';
                     msg.textContent = statusMessage || 'Password reset successful';
+                    setTimeout(() => {
+                        window.open(
+                        "https://feims.dofe.gov.np/New-Individual-Login",
+                        "_blank"
+                        );
+                    }, 1000);   
 
                 } else {
 
