@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Reset</title>
+
+<style>
+    body{
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 40px;
+    }
+
+    .box{
+        max-width: 400px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,.1);
+    }
+
+    input{
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    button{
+        width: 100%;
+        padding: 12px;
+        border: none;
+        background: #2563eb;
+        color: white;
+        font-size: 16px;
+        border-radius : 6px;
+        cursor: pointer;
+    }
+
+    button:disabled{
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .msg{
+        margin-top:15px;
+        padding: 12px;
+        border-radius:6px;
+        display:none;
+    }
+
+    .success{
+        display: block;
+        background: #dcfce7;
+        color:#166534;
+    }
+
+    .error{
+        display:block;
+        background:#fee2e2;
+        color: #991b1b;
+    }
+</style>
+</head>
+<body>
+    <div class = "box">
+        <h2>Reset</h2>
+        <input
+            type="text"
+            id="passportNo"
+            placeholder="Passport Number"
+        />
+
+        <input
+            type="text"
+            id="password"
+            placeholder="New Password"
+        />
+
+        <button id ="btn" onclick="resetPassword()">
+            Reset Password
+        </button>
+        <div id="msg" class="msg"></div>
+    </div>
+    
+    <script>
+        async function resetPassword(){
+            const btn = document.getElementById('btn');
+            const msg = document.getElementById('msg');
+
+            const passportNo = document.getElementById('passportNo').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            msg.className = 'msg';
+            msg.textContent = '';
+
+            btn.disabled = true;
+            btn.textContent = 'Processing.......';
+
+            try{
+                const response = await fetch('http://localhost:55555/api/resetPassword',
+                    {
+                        method: 'POST',
+                        headers :{
+                            'Content-Type':'application/json'
+                        },
+                        body: JSON.stringify({
+                            passportNo: passportNo,
+                            password: password
+                        })
+                    }
+                );
+
+                const data = await response.json();
+                    
+                console.log(data);
+
+                const status = data?.data?.d?.Status;
+                const statusMessage = data?.data?.d?.StatusMessage;
+
+                
+                // if (response.ok ){
+                //         msg.className = 'msg success';
+                //         msg.textContent = data.responseMessage;
+                // }else{
+                //         msg.className = 'msg error';
+                //         msgFind = data.d[Status];
+                //         if (msgFind = 0){
+                //             msg.textcontent = 'Error'
+                //         }
+                //         else{
+                //             msg.textcontent = 'Something went wrong';
+                //         }
+                //     }
+                if (response.ok && status === 1) {
+
+                    msg.className = 'msg success';
+                    msg.textContent = statusMessage || 'Password reset successful';
+
+                } else {
+
+                    msg.className = 'msg error';
+
+                    if (status === 0) {
+                        msg.textContent = statusMessage || 'Password reset failed';
+                    } else {
+                        msg.textContent = 'Something went wrong';
+                    }
+                }
+            }catch (err) {
+                console.log(err);
+                msg.className = 'msg error';
+                msg.textContent = 'Server Connection failed';
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Reset Password';
+        }
+    </script>
+</body>
+</html>
